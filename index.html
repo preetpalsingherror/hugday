@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>My Universe 🪐</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    <title>My Sanctuary 🛡️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600&family=Oswald:wght@500&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
     
     <style>
+        /* --- CORE RESET --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: none; }
 
         body {
@@ -14,116 +15,113 @@
             background: #000; color: #fff;
             margin: 0; padding: 0;
             overflow: hidden;
-            font-family: 'Montserrat', sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: 'Inter', sans-serif;
             position: relative;
         }
 
-        /* --- BACKGROUND STARS --- */
-        .stars {
+        /* --- LAYER 1: THE STORM (CANVAS) --- */
+        canvas {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px);
-            background-size: 550px 550px;
-            opacity: 0.5; z-index: 0;
-            animation: starMove 100s linear infinite;
+            z-index: 1; opacity: 0.6; pointer-events: none;
         }
-        @keyframes starMove { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
 
-        /* --- THE SOLAR SYSTEM STAGE --- */
-        .system-container {
-            position: relative; width: 300px; height: 300px;
-            display: flex; justify-content: center; align-items: center;
+        .storm-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, #000 90%);
+            z-index: 2; pointer-events: none;
+        }
+
+        /* --- LAYER 2: THE SAFE SPACE (WARMTH) --- */
+        .safe-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            /* Warm Angelic Light */
+            background: radial-gradient(circle, #fffbf0 0%, #ffecd2 40%, #fcb69f 100%);
+            z-index: 0; /* Behind storm initially */
+            opacity: 0; transform: scale(0.5);
+            transition: opacity 0.1s linear, transform 0.1s linear;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .ui-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* THE SUN (YOU) - INITIALLY DARK/COLD */
-        .sun {
-            width: 80px; height: 80px;
-            background: #333; /* Dark initially */
+        .hero-text {
+            font-family: 'Oswald', sans-serif; font-size: 1.5rem; letter-spacing: 2px;
+            text-align: center; margin-bottom: 40px; text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            transition: opacity 0.5s;
+        }
+
+        /* THE BUTTON */
+        .hold-btn {
+            position: relative; width: 100px; height: 100px;
             border-radius: 50%;
-            position: relative; z-index: 20;
-            transition: all 2s cubic-bezier(0.25, 1, 0.5, 1);
-            cursor: pointer;
-            box-shadow: 0 0 0 rgba(255, 165, 0, 0);
             display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; cursor: pointer;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* SUN IGNITED STATE */
-        .sun.ignited {
-            background: radial-gradient(circle, #ffd700, #ff8c00);
-            box-shadow: 0 0 50px #ff8c00, 0 0 100px #ff4500, 0 0 200px rgba(255, 69, 0, 0.5);
-            transform: scale(1.5);
-            border: none;
+        .hold-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
+
+        /* PROGRESS RING */
+        .progress-ring {
+            position: absolute; top: -10px; left: -10px;
+            width: 120px; height: 120px; transform: rotate(-90deg); pointer-events: none;
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.05s linear;
+            stroke: #fff; stroke-width: 2; stroke-linecap: round; fill: transparent;
+            filter: drop-shadow(0 0 5px #fff);
         }
 
-        /* ORBIT PATH */
-        .orbit {
-            position: absolute; width: 250px; height: 250px;
-            border: 1px dashed rgba(255,255,255,0.1);
-            border-radius: 50%;
-            transition: opacity 1s; opacity: 0;
-            animation: spin 10s linear infinite;
-        }
-        .sun.ignited + .orbit { opacity: 1; }
-
-        /* THE EARTH (HER) */
-        .earth {
-            position: absolute; top: -10px; left: 115px; /* Top center of orbit */
-            width: 20px; height: 20px;
-            background: #4facfe;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #4facfe;
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* --- UI TEXT --- */
-        .text-layer {
-            position: absolute; bottom: 15%; width: 100%; text-align: center;
-            z-index: 30; pointer-events: none;
-        }
-
-        .main-text {
-            font-family: 'Cinzel', serif; font-size: 1.2rem; margin-bottom: 10px;
-            color: rgba(255,255,255,0.8); transition: all 0.5s;
-        }
-        
-        .sub-text {
-            font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: #666;
+        .hint-text {
+            margin-top: 30px; font-size: 0.75rem; letter-spacing: 2px; opacity: 0.7;
+            font-weight: 600; text-transform: uppercase;
         }
 
         /* --- FINAL CARD --- */
         .final-card {
-            position: absolute; width: 85%; max-width: 350px;
-            background: rgba(20, 20, 20, 0.9);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 20px; padding: 40px 25px;
-            text-align: center; opacity: 0; transform: scale(0.9);
-            transition: all 1s; z-index: 50; pointer-events: none;
-            box-shadow: 0 0 50px rgba(255, 140, 0, 0.2);
+            position: absolute; width: 85%; max-width: 360px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px; padding: 40px 30px;
+            text-align: center;
+            opacity: 0; transform: translateY(20px) scale(0.95);
+            transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 50; pointer-events: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
         }
-
-        .card-active { opacity: 1; transform: scale(1); pointer-events: auto; }
+        
+        .card-active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 
         .final-title {
-            font-family: 'Cinzel', serif; font-size: 1.8rem; color: #ffd700; margin-bottom: 20px;
+            font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #d4af37;
+            margin-bottom: 20px; font-style: italic;
         }
         
         .final-body {
-            font-size: 0.95rem; line-height: 1.8; color: #ddd; margin-bottom: 30px;
+            font-family: 'Inter', sans-serif; font-size: 1rem; color: #333;
+            line-height: 1.6; font-weight: 500; margin-bottom: 30px;
         }
 
-        .highlight { color: #fff; font-weight: 700; }
+        .highlight { color: #000; font-weight: 700; text-transform: uppercase; }
 
         .wa-btn {
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            color: #000; padding: 15px 30px; text-decoration: none; border-radius: 50px;
-            font-weight: 700; font-size: 0.9rem; letter-spacing: 1px;
-            box-shadow: 0 5px 20px rgba(255, 140, 0, 0.4);
+            background: #111; color: #fff; padding: 16px 36px;
+            border-radius: 50px; text-decoration: none; font-weight: 600;
+            font-size: 0.9rem; letter-spacing: 0.5px; display: inline-block;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
-        /* OVERLAY */
+        /* --- START OVERLAY --- */
         .start-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 100;
@@ -131,153 +129,218 @@
             transition: opacity 0.8s;
         }
         .start-btn {
-            background: transparent; border: 1px solid #fff; color: #fff;
-            padding: 15px 40px; font-family: 'Cinzel'; margin-top: 20px; cursor: pointer;
+            background: transparent; border: 1px solid rgba(255,255,255,0.5);
+            color: #fff; padding: 15px 40px; border-radius: 50px;
+            font-family: 'Oswald', sans-serif; letter-spacing: 2px;
+            margin-top: 20px; cursor: pointer;
         }
 
     </style>
 </head>
 <body>
 
-    <audio id="space-sound" loop>
-        <source src="https://assets.mixkit.co/active_storage/stock_music/61/61-preview.mp3" type="audio/mpeg">
+    <audio id="rain-sound" loop>
+        <source src="https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="peace-sound" loop>
+        <source src="https://assets.mixkit.co/active_storage/stock_music/62/62-preview.mp3" type="audio/mpeg">
     </audio>
 
     <div class="start-overlay" id="start-screen">
-        <div style="font-family:'Montserrat'; letter-spacing:2px; font-size:0.8rem; opacity:0.7;">FOR ZOHARA</div>
-        <div style="font-family:'Cinzel'; font-size:1.5rem; margin-top:5px;">MY UNIVERSE</div>
-        <button class="start-btn" onclick="startApp()">ENTER</button>
+        <div style="font-family:'Playfair Display'; font-style:italic; font-size:2rem;">Zohara</div>
+        <div style="color:#666; font-size:0.75rem; margin-top:5px; letter-spacing:1px;">USE HEADPHONES 🎧</div>
+        <button class="start-btn" onclick="init()">ENTER</button>
     </div>
 
-    <div class="stars"></div>
+    <canvas id="rainCanvas"></canvas>
+    <div class="storm-overlay" id="storm-bg"></div>
+    <div class="safe-layer" id="safe-bg"></div>
 
-    <div class="system-container">
-        <div class="sun" id="sun"
-             ontouchstart="ignite(event)" ontouchend="extinguish()"
-             onmousedown="ignite(event)" onmouseup="extinguish()">
-        </div>
+    <div class="ui-container" id="ui-layer">
+        <div class="hero-text" id="status-text">The world is loud.</div>
         
-        <div class="orbit" id="orbit">
-            <div class="earth"></div>
+        <div style="position:relative;">
+            <svg class="progress-ring" width="120" height="120">
+                <circle class="progress-ring__circle" stroke="white" stroke-width="2" fill="transparent" r="56" cx="60" cy="60"/>
+            </svg>
+            <div class="hold-btn" id="btn"
+                 ontouchstart="startHold(event)" ontouchend="endHold()"
+                 onmousedown="startHold(event)" onmouseup="endHold()">
+                🛡️
+            </div>
         </div>
-    </div>
 
-    <div class="text-layer">
-        <div class="main-text" id="main-text">Space is cold.</div>
-        <div class="sub-text" id="sub-text">Hold the center to warm me</div>
+        <div class="hint-text" id="hint">Hold to find me</div>
     </div>
 
     <div class="final-card" id="final">
-        <div class="final-title">I Am Your Sun</div>
+        <div class="final-title">My Sanctuary</div>
         <div class="final-body">
-            You don't have to face the cold alone.<br><br>
-            Whenever you drift, <span class="highlight">I will pull you back.</span><br>
-            Whenever you are cold, <span class="highlight">I will warm you.</span><br><br>
-            I am always right here. Center of your universe.
+            I AM HERE.<br>
+            I WANNA BE WITH YOU.<br><br>
+            I want you to be <span class="highlight">happy</span> and <span class="highlight">relieved</span> with me.<br><br>
+            Whenever you need me, just come here.
         </div>
-        <a href="#" id="wa-link" class="wa-btn">You Are My Gravity ☀️</a>
+        <a href="#" id="wa-link" class="wa-btn">I Feel Safe With You ❤️</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         const yourPhoneNumber = "917795253497"; 
 
-        const sun = document.getElementById('sun');
-        const orbit = document.getElementById('orbit');
-        const mainText = document.getElementById('main-text');
-        const subText = document.getElementById('sub-text');
+        // ELEMENTS
         const startScreen = document.getElementById('start-screen');
+        const rainSound = document.getElementById('rain-sound');
+        const peaceSound = document.getElementById('peace-sound');
+        const safeBg = document.getElementById('safe-bg');
+        const stormBg = document.getElementById('storm-bg');
+        const canvas = document.getElementById('rainCanvas');
+        const ctx = canvas.getContext('2d');
+        const circle = document.querySelector('.progress-ring__circle');
+        const statusText = document.getElementById('status-text');
         const finalCard = document.getElementById('final');
-        const audio = document.getElementById('space-sound');
+        const uiLayer = document.getElementById('ui-layer');
 
+        // RING SETUP
+        const radius = circle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+
+        // STATE
+        let width, height;
+        let drops = [];
         let isHolding = false;
-        let holdTime = 0;
-        let interval;
+        let progress = 0;
         let finished = false;
 
-        function startApp() {
+        // INIT
+        function init() {
             startScreen.style.opacity = 0;
             setTimeout(() => startScreen.style.display = 'none', 800);
-            audio.volume = 0.2;
-            audio.play();
+            
+            rainSound.volume = 0.5;
+            rainSound.play();
+            peaceSound.volume = 0;
+            peaceSound.play();
+
+            resize();
+            createDrops();
+            loop(); // Start visual loop
         }
 
-        function ignite(e) {
-            e.preventDefault();
-            if(finished) return;
-            isHolding = true;
+        // RAIN ENGINE
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
 
-            // Visuals
-            sun.classList.add('ignited');
-            audio.volume = 1.0; // Louder music
-
-            // Haptic
-            if(navigator.vibrate) navigator.vibrate(50);
-
-            interval = setInterval(() => {
-                if(!isHolding) return;
-                holdTime++;
-
-                // Dynamic Text
-                if(holdTime > 10) {
-                    mainText.innerText = "I am here...";
-                    subText.innerText = "Stay close to me";
-                }
-                if(holdTime > 30) {
-                    mainText.innerText = "I won't let you drift.";
-                    subText.innerText = "You are safe in my orbit";
-                }
-                if(holdTime > 50) {
-                    mainText.innerText = "Always.";
-                }
-
-                if(holdTime > 70) {
-                    finish();
-                }
-            }, 100);
+        function createDrops() {
+            for(let i=0; i<150; i++) {
+                drops.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    l: Math.random() * 20 + 10,
+                    v: Math.random() * 10 + 10
+                });
+            }
         }
 
-        function extinguish() {
+        function drawRain() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Opacity of rain depends on progress (inverse)
+            ctx.strokeStyle = `rgba(255,255,255,${0.3 * (1 - progress/100)})`;
+            ctx.lineWidth = 1;
+
+            for(let i=0; i<drops.length; i++) {
+                let d = drops[i];
+                ctx.beginPath();
+                ctx.moveTo(d.x, d.y);
+                ctx.lineTo(d.x, d.y + d.l);
+                ctx.stroke();
+                
+                d.y += d.v;
+                if(d.y > height) {
+                    d.y = -d.l;
+                    d.x = Math.random() * width;
+                }
+            }
+        }
+
+        // INTERACTION HANDLERS
+        function startHold(e) { e.preventDefault(); if(!finished) isHolding = true; }
+        function endHold() { if(!finished) isHolding = false; }
+
+        // MAIN LOOP
+        function loop() {
             if(finished) return;
-            isHolding = false;
-            clearInterval(interval);
+
+            // 1. Draw Rain
+            drawRain();
+
+            // 2. Logic
+            if(isHolding) {
+                progress += 0.8;
+            } else {
+                progress -= 1.5;
+            }
+            progress = Math.max(0, Math.min(100, progress));
+
+            // 3. Update Visuals
+            const ratio = progress / 100;
             
-            // Revert Visuals
-            sun.classList.remove('ignited');
-            audio.volume = 0.2; // Quiet music
+            // Ring
+            circle.style.strokeDashoffset = circumference - (ratio * circumference);
             
-            // Reset Text if not finished
-            if(holdTime < 70) {
-                holdTime = 0;
-                mainText.innerText = "It's cold again.";
-                subText.innerText = "Don't leave my side.";
+            // Backgrounds
+            safeBg.style.opacity = ratio;
+            safeBg.style.transform = `scale(${0.5 + (ratio * 0.5)})`; // Expands from center
+            stormBg.style.opacity = 1 - ratio;
+
+            // Text
+            if(progress < 20) statusText.innerText = "The world is loud.";
+            else if(progress < 50) statusText.innerText = "I am here...";
+            else if(progress < 80) statusText.innerText = "Just you and me.";
+            else statusText.innerText = "Let it go.";
+
+            // Audio Mixing
+            rainSound.volume = Math.max(0, 0.5 * (1 - ratio));
+            peaceSound.volume = Math.min(1, 1.0 * ratio);
+
+            // Finish
+            if(progress >= 100) {
+                finish();
+            } else {
+                requestAnimationFrame(loop);
             }
         }
 
         function finish() {
             finished = true;
-            clearInterval(interval);
             
-            // Hide Background UI
-            document.querySelector('.system-container').style.opacity = 0;
-            document.querySelector('.text-layer').style.opacity = 0;
+            // Fade out UI
+            uiLayer.style.transition = "opacity 0.5s";
+            uiLayer.style.opacity = 0;
+            canvas.style.opacity = 0;
 
             setTimeout(() => {
                 finalCard.classList.add('card-active');
                 
-                // Sunburst Confetti
+                // Confetti
                 confetti({
                     particleCount: 150,
-                    spread: 360,
-                    startVelocity: 30,
-                    colors: ['#ffd700', '#ff8c00', '#ffffff'],
-                    shapes: ['circle']
+                    spread: 100,
+                    colors: ['#ffffff', '#ffecd2', '#d4af37'],
+                    origin: { y: 0.6 }
                 });
 
-                const msg = "I found my Sun! ☀️ You are my center. I never want to drift away from you. I love you!";
+                const msg = "I found my Sanctuary with you. 🛡️❤️ I am relieved and happy. I love you Zohara.";
                 document.getElementById('wa-link').href = `https://wa.me/${yourPhoneNumber}?text=${encodeURIComponent(msg)}`;
             }, 500);
         }
+
     </script>
 </body>
 </html>
