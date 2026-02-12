@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>My Sanctuary 🛡️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600&family=Oswald:wght@500&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+    <title>Hug Day 🫂</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Sacramento&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CORE RESET --- */
+        /* --- RESET & CORE --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: none; }
 
         body {
@@ -15,301 +15,256 @@
             background: #000; color: #fff;
             margin: 0; padding: 0;
             overflow: hidden;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             position: relative;
         }
 
-        /* --- LAYER 1: THE STORM (CANVAS) --- */
-        canvas {
+        /* --- BACKGROUND (THE SNAPS) --- */
+        .snap-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1; opacity: 0.6; pointer-events: none;
+            z-index: 0; overflow: hidden;
+            background: radial-gradient(circle at center, #2e0014 0%, #000 100%);
         }
 
-        .storm-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, transparent 0%, #000 90%);
-            z-index: 2; pointer-events: none;
+        /* Floating Rectangles representing "Snaps" */
+        .snap {
+            position: absolute; background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            animation: floatSnap 10s infinite linear;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.2);
+        }
+        @keyframes floatSnap { 
+            0% { transform: translateY(110vh) rotate(0deg) scale(0.8); opacity: 0; } 
+            20% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) rotate(45deg) scale(1); opacity: 0; } 
         }
 
-        /* --- LAYER 2: THE SAFE SPACE (WARMTH) --- */
-        .safe-layer {
+        /* FOG LAYER (BLUR) */
+        .fog-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* Warm Angelic Light */
-            background: radial-gradient(circle, #fffbf0 0%, #ffecd2 40%, #fcb69f 100%);
-            z-index: 0; /* Behind storm initially */
-            opacity: 0; transform: scale(0.5);
-            transition: opacity 0.1s linear, transform 0.1s linear;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            z-index: 5; transition: backdrop-filter 0.1s;
         }
 
-        /* --- UI ELEMENTS --- */
+        /* --- UI LAYER --- */
         .ui-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .hero-text {
-            font-family: 'Oswald', sans-serif; font-size: 1.5rem; letter-spacing: 2px;
-            text-align: center; margin-bottom: 40px; text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(0,0,0,0.8);
-            transition: opacity 0.5s;
+        /* DYNAMIC TEXT */
+        .story-text {
+            font-size: 1.2rem; color: #ffb7b2; text-align: center;
+            min-height: 60px; margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(255, 183, 178, 0.5);
+            transition: transform 0.3s, opacity 0.3s;
+            padding: 0 20px;
         }
 
-        /* THE BUTTON */
-        .hold-btn {
-            position: relative; width: 100px; height: 100px;
-            border-radius: 50%;
+        /* THE HEART BUTTON */
+        .heart-wrapper {
+            position: relative; width: 140px; height: 140px;
             display: flex; justify-content: center; align-items: center;
-            font-size: 2rem; cursor: pointer;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .hold-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
-
-        /* PROGRESS RING */
-        .progress-ring {
-            position: absolute; top: -10px; left: -10px;
-            width: 120px; height: 120px; transform: rotate(-90deg); pointer-events: none;
+        /* SVG FILL EFFECT */
+        .heart-svg {
+            width: 120px; height: 120px;
+            fill: rgba(255, 255, 255, 0.1);
+            stroke: #ff69b4; stroke-width: 2;
+            transform: scale(1); transition: transform 0.2s;
+            cursor: pointer; overflow: visible;
         }
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.05s linear;
-            stroke: #fff; stroke-width: 2; stroke-linecap: round; fill: transparent;
-            filter: drop-shadow(0 0 5px #fff);
+        
+        .heart-fill {
+            fill: #ff1493;
+            clip-path: inset(100% 0 0 0); /* Reveals from bottom up */
+            transition: clip-path 0.1s linear;
         }
 
-        .hint-text {
-            margin-top: 30px; font-size: 0.75rem; letter-spacing: 2px; opacity: 0.7;
-            font-weight: 600; text-transform: uppercase;
+        .active-glow {
+            filter: drop-shadow(0 0 20px #ff1493);
+            transform: scale(0.95);
+        }
+
+        .hint {
+            margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px;
+            color: rgba(255,255,255,0.5); text-transform: uppercase;
         }
 
         /* --- FINAL CARD --- */
         .final-card {
-            position: absolute; width: 85%; max-width: 360px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px; padding: 40px 30px;
+            position: absolute; width: 90%; max-width: 380px;
+            background: rgba(20, 10, 15, 0.95);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 20px; padding: 40px 25px;
             text-align: center;
-            opacity: 0; transform: translateY(20px) scale(0.95);
-            transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
-            z-index: 50; pointer-events: none;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            opacity: 0; transform: scale(0.9); pointer-events: none;
+            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 50;
+            box-shadow: 0 0 50px rgba(255, 20, 147, 0.3);
         }
         
-        .card-active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .card-active { opacity: 1; transform: scale(1); pointer-events: auto; }
 
-        .final-title {
-            font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #d4af37;
-            margin-bottom: 20px; font-style: italic;
-        }
-        
-        .final-body {
-            font-family: 'Inter', sans-serif; font-size: 1rem; color: #333;
-            line-height: 1.6; font-weight: 500; margin-bottom: 30px;
+        .quote-urdu {
+            font-family: 'Playfair Display', serif; font-style: italic;
+            font-size: 1.3rem; color: #ffb7b2; line-height: 1.6;
+            margin: 20px 0; border-left: 3px solid #ff1493; padding-left: 15px;
+            text-align: left;
         }
 
-        .highlight { color: #000; font-weight: 700; text-transform: uppercase; }
+        .english-note {
+            font-family: 'Quicksand', sans-serif; font-size: 0.9rem;
+            color: #ccc; line-height: 1.6; margin-bottom: 30px;
+        }
 
         .wa-btn {
-            background: #111; color: #fff; padding: 16px 36px;
-            border-radius: 50px; text-decoration: none; font-weight: 600;
-            font-size: 0.9rem; letter-spacing: 0.5px; display: inline-block;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background: #ff1493; color: #fff; padding: 15px 35px;
+            border-radius: 50px; text-decoration: none; font-weight: 700;
+            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
+            display: inline-block;
         }
 
-        /* --- START OVERLAY --- */
-        .start-overlay {
+        /* START OVERLAY */
+        .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 100;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.8s;
         }
         .start-btn {
-            background: transparent; border: 1px solid rgba(255,255,255,0.5);
-            color: #fff; padding: 15px 40px; border-radius: 50px;
-            font-family: 'Oswald', sans-serif; letter-spacing: 2px;
-            margin-top: 20px; cursor: pointer;
+            background: transparent; border: 1px solid #ff69b4; color: #ff69b4;
+            padding: 15px 40px; font-family: 'Quicksand'; font-weight: 700;
+            margin-top: 20px; cursor: pointer; border-radius: 30px;
         }
 
     </style>
 </head>
 <body>
 
-    <audio id="rain-sound" loop>
-        <source src="https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="peace-sound" loop>
-        <source src="https://assets.mixkit.co/active_storage/stock_music/62/62-preview.mp3" type="audio/mpeg">
+    <audio id="bg-music" loop>
+        <source src="https://assets.mixkit.co/active_storage/stock_music/114/114-preview.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="start-overlay" id="start-screen">
-        <div style="font-family:'Playfair Display'; font-style:italic; font-size:2rem;">Zohara</div>
-        <div style="color:#666; font-size:0.75rem; margin-top:5px; letter-spacing:1px;">USE HEADPHONES 🎧</div>
-        <button class="start-btn" onclick="init()">ENTER</button>
+    <div class="overlay" id="start-screen">
+        <div style="font-size:3rem;">🫂</div>
+        <div style="font-family:'Playfair Display'; font-size:1.5rem; margin-top:10px; color:#ffb7b2;">Hug Day</div>
+        <button class="start-btn" onclick="init()">Connect Memories</button>
     </div>
 
-    <canvas id="rainCanvas"></canvas>
-    <div class="storm-overlay" id="storm-bg"></div>
-    <div class="safe-layer" id="safe-bg"></div>
+    <div class="snap-container" id="snap-bg"></div>
+    <div class="fog-layer" id="fog"></div>
 
-    <div class="ui-container" id="ui-layer">
-        <div class="hero-text" id="status-text">The world is loud.</div>
+    <div class="ui-container" id="ui">
+        <div class="story-text" id="story">I miss you when you're offline...</div>
         
-        <div style="position:relative;">
-            <svg class="progress-ring" width="120" height="120">
-                <circle class="progress-ring__circle" stroke="white" stroke-width="2" fill="transparent" r="56" cx="60" cy="60"/>
+        <div class="heart-wrapper"
+             ontouchstart="startHold(event)" ontouchend="endHold()"
+             onmousedown="startHold(event)" onmouseup="endHold()">
+            
+            <svg class="heart-svg" id="heart-svg" viewBox="0 0 24 24">
+                <defs>
+                    <clipPath id="cut-off-bottom">
+                        <rect id="fill-rect" x="0" y="24" width="24" height="24" />
+                    </clipPath>
+                </defs>
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                <path class="heart-fill" clip-path="url(#cut-off-bottom)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
-            <div class="hold-btn" id="btn"
-                 ontouchstart="startHold(event)" ontouchend="endHold()"
-                 onmousedown="startHold(event)" onmouseup="endHold()">
-                🛡️
-            </div>
+
         </div>
 
-        <div class="hint-text" id="hint">Hold to find me</div>
+        <div class="hint" id="hint">Hold to feel close</div>
     </div>
 
     <div class="final-card" id="final">
-        <div class="final-title">My Sanctuary</div>
-        <div class="final-body">
-            I AM HERE.<br>
-            I WANNA BE WITH YOU.<br><br>
-            I want you to be <span class="highlight">happy</span> and <span class="highlight">relieved</span> with me.<br><br>
-            Whenever you need me, just come here.
+        <div style="font-size:1.5rem; margin-bottom:10px; color:#ff69b4;">Zohara</div>
+        
+        <div class="english-note">
+            I love watching your snaps all day.<br>
+            Whenever you aren't online,<br>
+            I just revisit them to feel you near.<br>
+            <br>
+            <b>I just want to be with you.</b>
         </div>
-        <a href="#" id="wa-link" class="wa-btn">I Feel Safe With You ❤️</a>
+
+        <div class="quote-urdu">
+            "Maine tumhe itna dekha jitna dekh sakta tha...<br>
+            Par do aankho se kitna dekha jaa sakta tha."
+        </div>
+
+        <a href="#" id="wa-link" class="wa-btn">I Love You ❤️</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         const yourPhoneNumber = "917795253497"; 
 
-        // ELEMENTS
+        const audio = document.getElementById('bg-music');
         const startScreen = document.getElementById('start-screen');
-        const rainSound = document.getElementById('rain-sound');
-        const peaceSound = document.getElementById('peace-sound');
-        const safeBg = document.getElementById('safe-bg');
-        const stormBg = document.getElementById('storm-bg');
-        const canvas = document.getElementById('rainCanvas');
-        const ctx = canvas.getContext('2d');
-        const circle = document.querySelector('.progress-ring__circle');
-        const statusText = document.getElementById('status-text');
+        const fillRect = document.getElementById('fill-rect');
+        const fog = document.getElementById('fog');
+        const story = document.getElementById('story');
+        const heartSvg = document.getElementById('heart-svg');
+        const snapBg = document.getElementById('snap-bg');
         const finalCard = document.getElementById('final');
-        const uiLayer = document.getElementById('ui-layer');
+        const ui = document.getElementById('ui');
 
-        // RING SETUP
-        const radius = circle.r.baseVal.value;
-        const circumference = radius * 2 * Math.PI;
-        circle.style.strokeDasharray = `${circumference} ${circumference}`;
-        circle.style.strokeDashoffset = circumference;
-
-        // STATE
-        let width, height;
-        let drops = [];
         let isHolding = false;
-        let progress = 0;
+        let progress = 0; // 0 to 100
         let finished = false;
+        let animationFrame;
 
-        // INIT
+        // GENERATE SNAPS (Background Rectangles)
+        for(let i=0; i<30; i++) {
+            let s = document.createElement('div');
+            s.classList.add('snap');
+            s.style.left = Math.random() * 100 + "vw";
+            s.style.width = Math.random() * 60 + 40 + "px";
+            s.style.height = parseFloat(s.style.width) * 1.5 + "px"; // Portrait aspect ratio
+            s.style.animationDuration = Math.random() * 10 + 10 + "s";
+            s.style.animationDelay = Math.random() * 5 + "s";
+            snapBg.appendChild(s);
+        }
+
         function init() {
             startScreen.style.opacity = 0;
             setTimeout(() => startScreen.style.display = 'none', 800);
             
-            rainSound.volume = 0.5;
-            rainSound.play();
-            peaceSound.volume = 0;
-            peaceSound.play();
+            audio.volume = 0.5;
+            audio.play();
 
-            resize();
-            createDrops();
-            loop(); // Start visual loop
+            loop();
         }
 
-        // RAIN ENGINE
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-
-        function createDrops() {
-            for(let i=0; i<150; i++) {
-                drops.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    l: Math.random() * 20 + 10,
-                    v: Math.random() * 10 + 10
-                });
-            }
+        function startHold(e) {
+            e.preventDefault();
+            if(finished) return;
+            isHolding = true;
+            heartSvg.classList.add('active-glow');
         }
 
-        function drawRain() {
-            ctx.clearRect(0, 0, width, height);
-            
-            // Opacity of rain depends on progress (inverse)
-            ctx.strokeStyle = `rgba(255,255,255,${0.3 * (1 - progress/100)})`;
-            ctx.lineWidth = 1;
-
-            for(let i=0; i<drops.length; i++) {
-                let d = drops[i];
-                ctx.beginPath();
-                ctx.moveTo(d.x, d.y);
-                ctx.lineTo(d.x, d.y + d.l);
-                ctx.stroke();
-                
-                d.y += d.v;
-                if(d.y > height) {
-                    d.y = -d.l;
-                    d.x = Math.random() * width;
-                }
-            }
+        function endHold() {
+            if(finished) return;
+            isHolding = false;
+            heartSvg.classList.remove('active-glow');
         }
 
-        // INTERACTION HANDLERS
-        function startHold(e) { e.preventDefault(); if(!finished) isHolding = true; }
-        function endHold() { if(!finished) isHolding = false; }
-
-        // MAIN LOOP
         function loop() {
             if(finished) return;
 
-            // 1. Draw Rain
-            drawRain();
-
-            // 2. Logic
             if(isHolding) {
-                progress += 0.8;
+                progress += 0.8; 
             } else {
                 progress -= 1.5;
             }
             progress = Math.max(0, Math.min(100, progress));
 
-            // 3. Update Visuals
-            const ratio = progress / 100;
-            
-            // Ring
-            circle.style.strokeDashoffset = circumference - (ratio * circumference);
-            
-            // Backgrounds
-            safeBg.style.opacity = ratio;
-            safeBg.style.transform = `scale(${0.5 + (ratio * 0.5)})`; // Expands from center
-            stormBg.style.opacity = 1 - ratio;
+            updateUI();
 
-            // Text
-            if(progress < 20) statusText.innerText = "The world is loud.";
-            else if(progress < 50) statusText.innerText = "I am here...";
-            else if(progress < 80) statusText.innerText = "Just you and me.";
-            else statusText.innerText = "Let it go.";
-
-            // Audio Mixing
-            rainSound.volume = Math.max(0, 0.5 * (1 - ratio));
-            peaceSound.volume = Math.min(1, 1.0 * ratio);
-
-            // Finish
             if(progress >= 100) {
                 finish();
             } else {
@@ -317,28 +272,45 @@
             }
         }
 
+        function updateUI() {
+            // 1. Fill Heart (SVG Clip)
+            // Y moves from 24 (empty) to 0 (full)
+            let yVal = 24 - (24 * (progress/100));
+            fillRect.setAttribute('y', yVal);
+
+            // 2. Clear Fog (Blur)
+            // Blur goes from 15px to 0px
+            let blurVal = 15 - (15 * (progress/100));
+            fog.style.backdropFilter = `blur(${blurVal}px)`;
+            fog.style.webkitBackdropFilter = `blur(${blurVal}px)`;
+
+            // 3. Dynamic Text
+            if(progress < 20) story.innerText = "I miss you when you're offline...";
+            else if(progress < 50) story.innerText = "So I just stare at your snaps...";
+            else if(progress < 80) story.innerText = "Wishing I could hold you...";
+            else story.innerText = "Just to be with you.";
+        }
+
         function finish() {
             finished = true;
-            
-            // Fade out UI
-            uiLayer.style.transition = "opacity 0.5s";
-            uiLayer.style.opacity = 0;
-            canvas.style.opacity = 0;
+            ui.style.transition = "opacity 0.5s";
+            ui.style.opacity = 0; // Hide hold button
+            fog.style.opacity = 0; // Remove fog entirely
 
             setTimeout(() => {
                 finalCard.classList.add('card-active');
                 
-                // Confetti
+                // Confetti Hearts
                 confetti({
                     particleCount: 150,
                     spread: 100,
-                    colors: ['#ffffff', '#ffecd2', '#d4af37'],
-                    origin: { y: 0.6 }
+                    colors: ['#ff1493', '#ff69b4', '#fff'],
+                    shapes: ['circle']
                 });
 
-                const msg = "I found my Sanctuary with you. 🛡️❤️ I am relieved and happy. I love you Zohara.";
+                const msg = "I saw the message! 🫂❤️ ";
                 document.getElementById('wa-link').href = `https://wa.me/${yourPhoneNumber}?text=${encodeURIComponent(msg)}`;
-            }, 500);
+            }, 600);
         }
 
     </script>
