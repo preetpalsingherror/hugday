@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Hug Day 🫂</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Sacramento&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
     
     <style>
         /* --- RESET & CORE --- */
@@ -12,120 +12,134 @@
 
         body {
             height: 100dvh; width: 100vw;
-            background: #000; color: #fff;
+            background: #0a0a0a; color: #fff; /* Deep Black */
             margin: 0; padding: 0;
             overflow: hidden;
-            font-family: 'Quicksand', sans-serif;
-            position: relative;
+            font-family: 'Lato', sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* --- BACKGROUND (THE SNAPS) --- */
-        .snap-container {
+        /* --- BACKGROUND LAYERS --- */
+        .bg-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; overflow: hidden;
-            background: radial-gradient(circle at center, #2e0014 0%, #000 100%);
+            background: radial-gradient(circle at center, #1a0f14 0%, #000000 100%);
+            z-index: 0;
         }
 
-        /* Floating Rectangles representing "Snaps" */
-        .snap {
-            position: absolute; background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 8px;
-            animation: floatSnap 10s infinite linear;
-            box-shadow: 0 0 15px rgba(255, 105, 180, 0.2);
+        /* Floating Glass Panes (Representing Snaps) */
+        .glass-pane {
+            position: absolute; background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            backdrop-filter: blur(2px);
+            animation: floatUp 15s infinite linear;
+            opacity: 0;
         }
-        @keyframes floatSnap { 
-            0% { transform: translateY(110vh) rotate(0deg) scale(0.8); opacity: 0; } 
-            20% { opacity: 0.5; }
-            100% { transform: translateY(-10vh) rotate(45deg) scale(1); opacity: 0; } 
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) scale(0.9); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
         }
 
-        /* FOG LAYER (BLUR) */
-        .fog-layer {
+        /* FOG OVERLAY (Visual Barrier) */
+        .fog {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            z-index: 5; transition: backdrop-filter 0.1s;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 5; pointer-events: none;
+            transition: backdrop-filter 0.1s linear; /* Smooth transition handled by JS */
         }
 
         /* --- UI LAYER --- */
         .ui-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10;
+            position: relative; z-index: 10; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* DYNAMIC TEXT */
+        /* DYNAMIC TEXT CONTAINER */
+        .text-box {
+            height: 80px; width: 80%; text-align: center;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 50px;
+        }
+        
         .story-text {
-            font-size: 1.2rem; color: #ffb7b2; text-align: center;
-            min-height: 60px; margin-bottom: 40px;
-            text-shadow: 0 0 10px rgba(255, 183, 178, 0.5);
-            transition: transform 0.3s, opacity 0.3s;
-            padding: 0 20px;
+            font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #e6cce6; /* Soft Mauve */
+            opacity: 0; transform: translateY(10px);
+            transition: all 0.8s ease; letter-spacing: 0.5px;
         }
+        
+        .story-text.active { opacity: 1; transform: translateY(0); }
 
-        /* THE HEART BUTTON */
+        /* HEART INTERACTION */
         .heart-wrapper {
-            position: relative; width: 140px; height: 140px;
-            display: flex; justify-content: center; align-items: center;
+            position: relative; width: 120px; height: 120px;
+            cursor: pointer; transform: scale(1);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        
+        .heart-wrapper:active { transform: scale(0.95); }
 
-        /* SVG FILL EFFECT */
-        .heart-svg {
-            width: 120px; height: 120px;
-            fill: rgba(255, 255, 255, 0.1);
-            stroke: #ff69b4; stroke-width: 2;
-            transform: scale(1); transition: transform 0.2s;
-            cursor: pointer; overflow: visible;
+        /* SVG Heart */
+        svg { width: 100%; height: 100%; overflow: visible; }
+        
+        .heart-stroke {
+            fill: transparent; stroke: rgba(255, 255, 255, 0.2); stroke-width: 1.5;
         }
         
         .heart-fill {
-            fill: #ff1493;
-            clip-path: inset(100% 0 0 0); /* Reveals from bottom up */
+            fill: #b76e79; /* Muted Rose Gold */
+            clip-path: inset(100% 0 0 0); /* Reveals from bottom */
             transition: clip-path 0.1s linear;
-        }
-
-        .active-glow {
-            filter: drop-shadow(0 0 20px #ff1493);
-            transform: scale(0.95);
+            filter: drop-shadow(0 0 15px rgba(183, 110, 121, 0.4));
         }
 
         .hint {
-            margin-top: 40px; font-size: 0.8rem; letter-spacing: 2px;
-            color: rgba(255,255,255,0.5); text-transform: uppercase;
+            margin-top: 40px; font-size: 0.75rem; color: rgba(255,255,255,0.4);
+            letter-spacing: 3px; text-transform: uppercase;
         }
 
         /* --- FINAL CARD --- */
         .final-card {
-            position: absolute; width: 90%; max-width: 380px;
-            background: rgba(20, 10, 15, 0.95);
-            border: 1px solid rgba(255, 105, 180, 0.3);
-            border-radius: 20px; padding: 40px 25px;
+            position: absolute; width: 88%; max-width: 400px;
+            background: rgba(20, 15, 18, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 50px 30px;
             text-align: center;
-            opacity: 0; transform: scale(0.9); pointer-events: none;
-            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0; transform: translateY(20px); pointer-events: none;
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
             z-index: 50;
-            box-shadow: 0 0 50px rgba(255, 20, 147, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
         
-        .card-active { opacity: 1; transform: scale(1); pointer-events: auto; }
+        .card-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
-        .quote-urdu {
-            font-family: 'Playfair Display', serif; font-style: italic;
-            font-size: 1.3rem; color: #ffb7b2; line-height: 1.6;
-            margin: 20px 0; border-left: 3px solid #ff1493; padding-left: 15px;
-            text-align: left;
+        .final-title {
+            font-family: 'Playfair Display', serif; font-size: 2rem; color: #fff;
+            margin-bottom: 25px;
         }
 
-        .english-note {
-            font-family: 'Quicksand', sans-serif; font-size: 0.9rem;
-            color: #ccc; line-height: 1.6; margin-bottom: 30px;
+        .english-section {
+            font-size: 0.95rem; line-height: 1.7; color: #ccc; margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        /* THE URDU COUPLET STYLE */
+        .urdu-box {
+            margin: 30px 0; padding: 20px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .urdu-text {
+            font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600;
+            font-size: 1.2rem; color: #d4af37; /* Muted Gold */
+            line-height: 1.6;
         }
 
         .wa-btn {
-            background: #ff1493; color: #fff; padding: 15px 35px;
-            border-radius: 50px; text-decoration: none; font-weight: 700;
-            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
-            display: inline-block;
+            background: #b76e79; color: #fff; padding: 16px 40px;
+            border-radius: 50px; text-decoration: none; font-size: 0.9rem; letter-spacing: 1px;
+            display: inline-block; transition: background 0.3s;
         }
 
         /* START OVERLAY */
@@ -133,12 +147,12 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 100;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.8s;
+            transition: opacity 1s;
         }
-        .start-btn {
-            background: transparent; border: 1px solid #ff69b4; color: #ff69b4;
-            padding: 15px 40px; font-family: 'Quicksand'; font-weight: 700;
-            margin-top: 20px; cursor: pointer; border-radius: 30px;
+        .enter-btn {
+            background: transparent; border: 1px solid #b76e79; color: #b76e79;
+            padding: 14px 35px; font-family: 'Lato'; letter-spacing: 2px;
+            font-size: 0.8rem; border-radius: 50px; margin-top: 30px; cursor: pointer;
         }
 
     </style>
@@ -146,54 +160,59 @@
 <body>
 
     <audio id="bg-music" loop>
-        <source src="https://assets.mixkit.co/active_storage/stock_music/114/114-preview.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/active_storage/stock_music/62/62-preview.mp3" type="audio/mpeg">
     </audio>
 
     <div class="overlay" id="start-screen">
-        <div style="font-size:3rem;">🫂</div>
-        <div style="font-family:'Playfair Display'; font-size:1.5rem; margin-top:10px; color:#ffb7b2;">Hug Day</div>
-        <button class="start-btn" onclick="init()">Connect Memories</button>
+        <div style="font-family:'Playfair Display'; font-size:2.2rem; font-style:italic; color:#fff;">Zohara</div>
+        <div style="color:#666; font-size:0.75rem; margin-top:10px; letter-spacing:2px;">HUG DAY</div>
+        <button class="enter-btn" onclick="init()">OPEN</button>
     </div>
 
-    <div class="snap-container" id="snap-bg"></div>
-    <div class="fog-layer" id="fog"></div>
+    <div class="bg-layer" id="bg-layer"></div>
+    <div class="fog" id="fog"></div>
 
-    <div class="ui-container" id="ui">
-        <div class="story-text" id="story">I miss you when you're offline...</div>
+    <div class="ui-container" id="ui-layer">
         
-        <div class="heart-wrapper"
+        <div class="text-box">
+            <div class="story-text active" id="text-display">The distance feels long...</div>
+        </div>
+
+        <div class="heart-wrapper" id="heart-btn"
              ontouchstart="startHold(event)" ontouchend="endHold()"
              onmousedown="startHold(event)" onmouseup="endHold()">
             
-            <svg class="heart-svg" id="heart-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24">
+                <path class="heart-stroke" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                
                 <defs>
-                    <clipPath id="cut-off-bottom">
+                    <clipPath id="fill-clip">
                         <rect id="fill-rect" x="0" y="24" width="24" height="24" />
                     </clipPath>
                 </defs>
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                <path class="heart-fill" clip-path="url(#cut-off-bottom)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                <path class="heart-fill" clip-path="url(#fill-clip)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
-
         </div>
 
-        <div class="hint" id="hint">Hold to feel close</div>
+        <div class="hint" id="hint">Hold to feel me</div>
+
     </div>
 
     <div class="final-card" id="final">
-        <div style="font-size:1.5rem; margin-bottom:10px; color:#ff69b4;">Zohara</div>
+        <div class="final-title">My Zohara</div>
         
-        <div class="english-note">
+        <div class="english-section">
             I love watching your snaps all day.<br>
             Whenever you aren't online,<br>
-            I just revisit them to feel you near.<br>
-            <br>
-            <b>I just want to be with you.</b>
+            I revisit them just to feel you near.<br><br>
+            Bas ek he baat dill mey hai...
         </div>
 
-        <div class="quote-urdu">
-            "Maine tumhe itna dekha jitna dekh sakta tha...<br>
-            Par do aankho se kitna dekha jaa sakta tha."
+        <div class="urdu-box">
+            <div class="urdu-text">
+                "Maine tumhe itna dekha<br>jitna dekh sakta tha...<br><br>
+                Par do aankho se<br>kitna dekh sakta tha."
+            </div>
         </div>
 
         <a href="#" id="wa-link" class="wa-btn">I Love You ❤️</a>
@@ -203,114 +222,165 @@
     <script>
         const yourPhoneNumber = "917795253497"; 
 
-        const audio = document.getElementById('bg-music');
+        // CONFIGURATION
+        const totalDuration = 1200; // Approx 12 seconds (Slow & Steady)
+        const storyLines = [
+            { text: "I miss you when you're offline...", trigger: 5 },
+            { text: "So I just stare at your snaps...", trigger: 25 },
+            { text: "Trying to memorize every detail...", trigger: 50 },
+            { text: "Wishing I could be there...", trigger: 75 },
+            { text: "Just to hold you.", trigger: 90 }
+        ];
+
+        // ELEMENTS
         const startScreen = document.getElementById('start-screen');
+        const audio = document.getElementById('bg-music');
         const fillRect = document.getElementById('fill-rect');
         const fog = document.getElementById('fog');
-        const story = document.getElementById('story');
-        const heartSvg = document.getElementById('heart-svg');
-        const snapBg = document.getElementById('snap-bg');
+        const textDisplay = document.getElementById('text-display');
+        const uiLayer = document.getElementById('ui-layer');
         const finalCard = document.getElementById('final');
-        const ui = document.getElementById('ui');
+        const bgLayer = document.getElementById('bg-layer');
 
         let isHolding = false;
-        let progress = 0; // 0 to 100
+        let progress = 0; // 0 to 1000
+        let currentLineIndex = -1;
         let finished = false;
         let animationFrame;
 
-        // GENERATE SNAPS (Background Rectangles)
-        for(let i=0; i<30; i++) {
+        // GENERATE GLASS SNAPS
+        for(let i=0; i<20; i++) {
             let s = document.createElement('div');
-            s.classList.add('snap');
-            s.style.left = Math.random() * 100 + "vw";
-            s.style.width = Math.random() * 60 + 40 + "px";
-            s.style.height = parseFloat(s.style.width) * 1.5 + "px"; // Portrait aspect ratio
-            s.style.animationDuration = Math.random() * 10 + 10 + "s";
-            s.style.animationDelay = Math.random() * 5 + "s";
-            snapBg.appendChild(s);
+            s.classList.add('glass-pane');
+            s.style.left = Math.random() * 90 + 5 + "%";
+            s.style.width = Math.random() * 60 + 50 + "px";
+            s.style.height = parseFloat(s.style.width) * 1.5 + "px";
+            s.style.animationDuration = Math.random() * 10 + 15 + "s";
+            s.style.animationDelay = Math.random() * 10 + "s";
+            bgLayer.appendChild(s);
         }
 
         function init() {
             startScreen.style.opacity = 0;
-            setTimeout(() => startScreen.style.display = 'none', 800);
+            setTimeout(() => startScreen.style.display = 'none', 1000);
             
-            audio.volume = 0.5;
+            // Audio Fade In
+            audio.volume = 0;
             audio.play();
+            fadeInAudio();
 
             loop();
         }
 
-        function startHold(e) {
-            e.preventDefault();
-            if(finished) return;
-            isHolding = true;
-            heartSvg.classList.add('active-glow');
+        function fadeInAudio() {
+            let vol = 0;
+            let fade = setInterval(() => {
+                if(vol < 0.6) {
+                    vol += 0.05;
+                    audio.volume = vol;
+                } else {
+                    clearInterval(fade);
+                }
+            }, 200);
         }
 
-        function endHold() {
-            if(finished) return;
-            isHolding = false;
-            heartSvg.classList.remove('active-glow');
-        }
+        function startHold(e) { e.preventDefault(); if(!finished) isHolding = true; }
+        function endHold() { if(!finished) isHolding = false; }
 
         function loop() {
             if(finished) return;
 
+            // PHYSICS
             if(isHolding) {
-                progress += 0.8; 
+                progress += 1.5; // Slow fill speed
             } else {
-                progress -= 1.5;
+                progress -= 2; // Decay speed
             }
-            progress = Math.max(0, Math.min(100, progress));
+            progress = Math.max(0, Math.min(totalDuration, progress));
 
-            updateUI();
+            // CALCULATE PERCENTAGE (0 to 1)
+            const ratio = progress / totalDuration;
 
-            if(progress >= 100) {
+            // UPDATE UI
+            // 1. Fill Heart (24 to 0)
+            let yVal = 24 - (24 * ratio);
+            fillRect.setAttribute('y', yVal);
+
+            // 2. Clear Fog (20px to 0px)
+            let blurVal = 20 - (20 * ratio);
+            fog.style.backdropFilter = `blur(${blurVal}px)`;
+            fog.style.webkitBackdropFilter = `blur(${blurVal}px)`;
+
+            // 3. Update Text
+            let percentage = ratio * 100;
+            updateText(percentage);
+
+            // 4. Finish
+            if(progress >= totalDuration) {
                 finish();
             } else {
                 requestAnimationFrame(loop);
             }
         }
 
-        function updateUI() {
-            // 1. Fill Heart (SVG Clip)
-            // Y moves from 24 (empty) to 0 (full)
-            let yVal = 24 - (24 * (progress/100));
-            fillRect.setAttribute('y', yVal);
+        function updateText(pct) {
+            // Find which line we should show based on percentage
+            let activeLine = -1;
+            for(let i=0; i<storyLines.length; i++) {
+                if(pct >= storyLines[i].trigger) activeLine = i;
+            }
 
-            // 2. Clear Fog (Blur)
-            // Blur goes from 15px to 0px
-            let blurVal = 15 - (15 * (progress/100));
-            fog.style.backdropFilter = `blur(${blurVal}px)`;
-            fog.style.webkitBackdropFilter = `blur(${blurVal}px)`;
-
-            // 3. Dynamic Text
-            if(progress < 20) story.innerText = "I miss you when you're offline...";
-            else if(progress < 50) story.innerText = "So I just stare at your snaps...";
-            else if(progress < 80) story.innerText = "Wishing I could hold you...";
-            else story.innerText = "Just to be with you.";
+            // Only update if it changed
+            if(activeLine !== currentLineIndex) {
+                currentLineIndex = activeLine;
+                if(activeLine > -1) {
+                    // Fade Out
+                    textDisplay.classList.remove('active');
+                    
+                    setTimeout(() => {
+                        textDisplay.innerText = storyLines[activeLine].text;
+                        // Fade In
+                        textDisplay.classList.add('active');
+                    }, 400); // Wait for fade out
+                }
+            }
+            
+            // Revert to start text if dropped low
+            if(pct < 5 && currentLineIndex !== -1) {
+                currentLineIndex = -1;
+                textDisplay.classList.remove('active');
+                setTimeout(() => {
+                    textDisplay.innerText = "The distance feels long...";
+                    textDisplay.classList.add('active');
+                }, 400);
+            }
         }
 
         function finish() {
             finished = true;
-            ui.style.transition = "opacity 0.5s";
-            ui.style.opacity = 0; // Hide hold button
-            fog.style.opacity = 0; // Remove fog entirely
+            
+            // Smoothly remove UI
+            uiLayer.style.transition = "opacity 0.8s";
+            uiLayer.style.opacity = 0;
+            fog.style.transition = "opacity 0.8s";
+            fog.style.opacity = 0;
 
             setTimeout(() => {
                 finalCard.classList.add('card-active');
                 
-                // Confetti Hearts
+                // Elegant, slow confetti
                 confetti({
-                    particleCount: 150,
-                    spread: 100,
-                    colors: ['#ff1493', '#ff69b4', '#fff'],
-                    shapes: ['circle']
+                    particleCount: 100,
+                    spread: 90,
+                    colors: ['#b76e79', '#ffffff', '#d4af37'],
+                    gravity: 0.8,
+                    ticks: 300,
+                    startVelocity: 20
                 });
 
-                const msg = "I saw the message! 🫂❤️ ";
+                const msg = "I love you Zohara! ❤️ 'Maine tumhe itna dekha jitna dekh sakta tha...' Happy Hug Day!";
                 document.getElementById('wa-link').href = `https://wa.me/${yourPhoneNumber}?text=${encodeURIComponent(msg)}`;
-            }, 600);
+            }, 800);
         }
 
     </script>
