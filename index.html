@@ -7,26 +7,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- RESET & CORE --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: none; }
 
         body {
             height: 100dvh; width: 100vw;
-            background: #0a0a0a; color: #fff; /* Deep Black */
+            background: #000; color: #fff;
             margin: 0; padding: 0;
             overflow: hidden;
             font-family: 'Lato', sans-serif;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* --- BACKGROUND LAYERS --- */
+        /* --- BACKGROUND --- */
         .bg-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, #1a0f14 0%, #000000 100%);
             z-index: 0;
         }
 
-        /* Floating Glass Panes (Representing Snaps) */
         .glass-pane {
             position: absolute; background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -42,12 +40,11 @@
             100% { transform: translateY(-10vh) scale(1); opacity: 0; }
         }
 
-        /* FOG OVERLAY (Visual Barrier) */
         .fog {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             z-index: 5; pointer-events: none;
-            transition: backdrop-filter 0.1s linear; /* Smooth transition handled by JS */
+            transition: backdrop-filter 0.1s linear;
         }
 
         /* --- UI LAYER --- */
@@ -56,7 +53,6 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* DYNAMIC TEXT CONTAINER */
         .text-box {
             height: 80px; width: 80%; text-align: center;
             display: flex; align-items: center; justify-content: center;
@@ -64,52 +60,65 @@
         }
         
         .story-text {
-            font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #e6cce6; /* Soft Mauve */
+            font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #ffccd5;
             opacity: 0; transform: translateY(10px);
             transition: all 0.8s ease; letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
         }
-        
         .story-text.active { opacity: 1; transform: translateY(0); }
 
-        /* HEART INTERACTION */
+        /* --- THE GLOWING HEART --- */
         .heart-wrapper {
-            position: relative; width: 120px; height: 120px;
+            position: relative; width: 140px; height: 140px;
             cursor: pointer; transform: scale(1);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* IDLE PULSE */
+            animation: idlePulse 2s infinite ease-in-out;
         }
-        
-        .heart-wrapper:active { transform: scale(0.95); }
 
-        /* SVG Heart */
+        @keyframes idlePulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(255, 20, 147, 0.2)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(255, 20, 147, 0.5)); }
+        }
+
+        /* Active State (Holding) */
+        .heart-wrapper.holding {
+            animation: fastPulse 0.5s infinite ease-in-out;
+            filter: drop-shadow(0 0 30px rgba(255, 0, 80, 0.8)); /* INTENSE GLOW */
+        }
+        @keyframes fastPulse {
+            0%, 100% { transform: scale(0.95); }
+            50% { transform: scale(1.0); }
+        }
+
         svg { width: 100%; height: 100%; overflow: visible; }
         
         .heart-stroke {
-            fill: transparent; stroke: rgba(255, 255, 255, 0.2); stroke-width: 1.5;
+            fill: transparent; stroke: rgba(255, 255, 255, 0.5); stroke-width: 1.5;
         }
         
         .heart-fill {
-            fill: #b76e79; /* Muted Rose Gold */
-            clip-path: inset(100% 0 0 0); /* Reveals from bottom */
+            fill: #ff0050; /* Bright Neon Red/Pink */
+            clip-path: inset(100% 0 0 0);
             transition: clip-path 0.1s linear;
-            filter: drop-shadow(0 0 15px rgba(183, 110, 121, 0.4));
         }
 
         .hint {
-            margin-top: 40px; font-size: 0.75rem; color: rgba(255,255,255,0.4);
+            margin-top: 40px; font-size: 0.75rem; color: rgba(255,255,255,0.6);
             letter-spacing: 3px; text-transform: uppercase;
         }
 
         /* --- FINAL CARD --- */
         .final-card {
             position: absolute; width: 88%; max-width: 400px;
-            background: rgba(20, 15, 18, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(20, 10, 15, 0.95);
+            border: 1px solid rgba(255, 105, 180, 0.3);
             border-radius: 16px; padding: 50px 30px;
             text-align: center;
             opacity: 0; transform: translateY(20px); pointer-events: none;
             transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
             z-index: 50;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 0 60px rgba(255, 20, 147, 0.4);
         }
         
         .card-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
@@ -120,26 +129,25 @@
         }
 
         .english-section {
-            font-size: 0.95rem; line-height: 1.7; color: #ccc; margin-bottom: 30px;
+            font-size: 0.95rem; line-height: 1.7; color: #eee; margin-bottom: 30px;
             font-weight: 300;
         }
 
-        /* THE URDU COUPLET STYLE */
         .urdu-box {
             margin: 30px 0; padding: 20px 0;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
         .urdu-text {
             font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600;
-            font-size: 1.2rem; color: #d4af37; /* Muted Gold */
+            font-size: 1.2rem; color: #ffd700; 
             line-height: 1.6;
         }
 
         .wa-btn {
-            background: #b76e79; color: #fff; padding: 16px 40px;
+            background: #ff0050; color: #fff; padding: 16px 40px;
             border-radius: 50px; text-decoration: none; font-size: 0.9rem; letter-spacing: 1px;
-            display: inline-block; transition: background 0.3s;
+            display: inline-block; box-shadow: 0 5px 20px rgba(255, 0, 80, 0.4);
         }
 
         /* START OVERLAY */
@@ -150,7 +158,7 @@
             transition: opacity 1s;
         }
         .enter-btn {
-            background: transparent; border: 1px solid #b76e79; color: #b76e79;
+            background: transparent; border: 1px solid #ff0050; color: #ff0050;
             padding: 14px 35px; font-family: 'Lato'; letter-spacing: 2px;
             font-size: 0.8rem; border-radius: 50px; margin-top: 30px; cursor: pointer;
         }
@@ -165,8 +173,8 @@
 
     <div class="overlay" id="start-screen">
         <div style="font-family:'Playfair Display'; font-size:2.2rem; font-style:italic; color:#fff;">My love</div>
-        <div style="color:#666; font-size:0.75rem; margin-top:10px; letter-spacing:2px;">HUG DAY</div>
-        <button class="enter-btn" onclick="init()">OPEN</button>
+        <div style="color:#888; font-size:0.75rem; margin-top:10px; letter-spacing:2px;">HUG DAY</div>
+        <button class="enter-btn" onclick="init()">OPEN MEMORIES</button>
     </div>
 
     <div class="bg-layer" id="bg-layer"></div>
@@ -194,15 +202,15 @@
             </svg>
         </div>
 
-        <div class="hint" id="hint">Hold to feel me</div>
+        <div class="hint" id="hint">Hold to see clearly</div>
 
     </div>
 
     <div class="final-card" id="final">
-        <div class="final-title">My love</div>
+        <div class="final-title">My Love</div>
         
         <div class="english-section">
-            I love watching your snaps all day.<br>
+            I love seeing your snaps all day.<br>
             Whenever you aren't online,<br>
             I revisit them just to feel you near.<br><br>
             Bas ek he baat dill mey hai...
@@ -222,17 +230,15 @@
     <script>
         const yourPhoneNumber = "917795253497"; 
 
-        // CONFIGURATION
-        const totalDuration = 1200; // Approx 12 seconds (Slow & Steady)
+        const totalDuration = 1000; // Slower fill
         const storyLines = [
             { text: "I miss you when you're offline...", trigger: 5 },
             { text: "So I just stare at your snaps...", trigger: 25 },
-            { text: "Trying to memorize every detail...", trigger: 50 },
-            { text: "Wishing I could be there...", trigger: 75 },
-            { text: "Just to hold you.", trigger: 90 }
+            { text: "Memorizing every detail...", trigger: 50 },
+            { text: "Wishing I could step through the screen...", trigger: 75 },
+            { text: "Just to hug you.", trigger: 90 }
         ];
 
-        // ELEMENTS
         const startScreen = document.getElementById('start-screen');
         const audio = document.getElementById('bg-music');
         const fillRect = document.getElementById('fill-rect');
@@ -241,14 +247,14 @@
         const uiLayer = document.getElementById('ui-layer');
         const finalCard = document.getElementById('final');
         const bgLayer = document.getElementById('bg-layer');
+        const heartBtn = document.getElementById('heart-btn');
 
         let isHolding = false;
-        let progress = 0; // 0 to 1000
+        let progress = 0; 
         let currentLineIndex = -1;
         let finished = false;
-        let animationFrame;
 
-        // GENERATE GLASS SNAPS
+        // GLASS PANES
         for(let i=0; i<20; i++) {
             let s = document.createElement('div');
             s.classList.add('glass-pane');
@@ -263,103 +269,86 @@
         function init() {
             startScreen.style.opacity = 0;
             setTimeout(() => startScreen.style.display = 'none', 1000);
-            
-            // Audio Fade In
             audio.volume = 0;
             audio.play();
-            fadeInAudio();
+            
+            // Fade In Audio
+            let vol = 0;
+            let interval = setInterval(() => {
+                if(vol < 0.6) { vol += 0.05; audio.volume = vol; }
+                else clearInterval(interval);
+            }, 200);
 
             loop();
         }
 
-        function fadeInAudio() {
-            let vol = 0;
-            let fade = setInterval(() => {
-                if(vol < 0.6) {
-                    vol += 0.05;
-                    audio.volume = vol;
-                } else {
-                    clearInterval(fade);
-                }
-            }, 200);
+        function startHold(e) { 
+            e.preventDefault(); 
+            if(!finished) {
+                isHolding = true; 
+                heartBtn.classList.add('holding'); // Trigger GLOW
+            }
         }
 
-        function startHold(e) { e.preventDefault(); if(!finished) isHolding = true; }
-        function endHold() { if(!finished) isHolding = false; }
+        function endHold() { 
+            if(!finished) {
+                isHolding = false;
+                heartBtn.classList.remove('holding'); // Remove GLOW
+            }
+        }
 
         function loop() {
             if(finished) return;
 
-            // PHYSICS
-            if(isHolding) {
-                progress += 1.5; // Slow fill speed
-            } else {
-                progress -= 2; // Decay speed
-            }
-            progress = Math.max(0, Math.min(totalDuration, progress));
+            if(isHolding) progress += 1.5; 
+            else progress -= 2;
 
-            // CALCULATE PERCENTAGE (0 to 1)
+            progress = Math.max(0, Math.min(totalDuration, progress));
             const ratio = progress / totalDuration;
 
-            // UPDATE UI
-            // 1. Fill Heart (24 to 0)
+            // Update Fill (24 to 0)
             let yVal = 24 - (24 * ratio);
             fillRect.setAttribute('y', yVal);
 
-            // 2. Clear Fog (20px to 0px)
+            // Update Fog (20px to 0px)
             let blurVal = 20 - (20 * ratio);
             fog.style.backdropFilter = `blur(${blurVal}px)`;
             fog.style.webkitBackdropFilter = `blur(${blurVal}px)`;
 
-            // 3. Update Text
-            let percentage = ratio * 100;
-            updateText(percentage);
+            updateText(ratio * 100);
 
-            // 4. Finish
-            if(progress >= totalDuration) {
-                finish();
-            } else {
-                requestAnimationFrame(loop);
-            }
+            if(progress >= totalDuration) finish();
+            else requestAnimationFrame(loop);
         }
 
         function updateText(pct) {
-            // Find which line we should show based on percentage
             let activeLine = -1;
             for(let i=0; i<storyLines.length; i++) {
                 if(pct >= storyLines[i].trigger) activeLine = i;
             }
 
-            // Only update if it changed
             if(activeLine !== currentLineIndex) {
                 currentLineIndex = activeLine;
                 if(activeLine > -1) {
-                    // Fade Out
-                    textDisplay.classList.remove('active');
-                    
+                    textDisplay.style.opacity = 0;
                     setTimeout(() => {
                         textDisplay.innerText = storyLines[activeLine].text;
-                        // Fade In
-                        textDisplay.classList.add('active');
-                    }, 400); // Wait for fade out
+                        textDisplay.style.opacity = 1;
+                    }, 400); 
                 }
             }
-            
-            // Revert to start text if dropped low
             if(pct < 5 && currentLineIndex !== -1) {
                 currentLineIndex = -1;
-                textDisplay.classList.remove('active');
+                textDisplay.style.opacity = 0;
                 setTimeout(() => {
                     textDisplay.innerText = "The distance feels long...";
-                    textDisplay.classList.add('active');
-                }, 400);
+                    textDisplay.style.opacity = 1;
+                }, 400); 
             }
         }
 
         function finish() {
             finished = true;
-            
-            // Smoothly remove UI
             uiLayer.style.transition = "opacity 0.8s";
             uiLayer.style.opacity = 0;
             fog.style.transition = "opacity 0.8s";
@@ -367,22 +356,11 @@
 
             setTimeout(() => {
                 finalCard.classList.add('card-active');
-                
-                // Elegant, slow confetti
-                confetti({
-                    particleCount: 100,
-                    spread: 90,
-                    colors: ['#b76e79', '#ffffff', '#d4af37'],
-                    gravity: 0.8,
-                    ticks: 300,
-                    startVelocity: 20
-                });
-
-                const msg = "I love you Zohara! ❤️ 'Maine tumhe itna dekha jitna dekh sakta tha...' Happy Hug Day!";
+                confetti({ particleCount: 150, spread: 100, colors: ['#ff0050', '#ffffff', '#ffd700'] });
+                const msg = " 'Maine tumhe itna dekha jitna dekha jaa sakta tha...' I love you Zohara!";
                 document.getElementById('wa-link').href = `https://wa.me/${yourPhoneNumber}?text=${encodeURIComponent(msg)}`;
             }, 800);
         }
-
     </script>
 </body>
 </html>
